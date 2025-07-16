@@ -1,0 +1,247 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Add Menu Item{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Add Menu Item</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <a href="{{ url_for('admin.manage_menu') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Menu
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-plus-circle"></i> Menu Item Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data" id="addMenuItemForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Item Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                    <div class="form-text">Enter the menu item name</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="category" class="form-label">Category <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="category" name="category" required>
+                                        <option value="">Select Category</option>
+                                        <option value="Pizza">Pizza</option>
+                                        <option value="Burgers">Burgers</option>
+                                        <option value="Desserts">Desserts</option>
+                                        <option value="Salads">Salads</option>
+                                        <option value="Deals">Deals</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="price" class="form-label">Price ($) <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="price" name="price" step="0.01" min="0" required>
+                                    <div class="form-text">Enter price in RS (e.g., 12.99)</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                                    <div class="form-text">Provide a detailed description of the menu item</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="image" class="form-label">Menu Item Image</label>
+                                    <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                                    <div class="form-text">Upload an image for the menu item (JPG, PNG, GIF allowed). Leave empty for default image.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="is_available" name="is_available" checked>
+                                        <label class="form-check-label" for="is_available">
+                                            Available for ordering
+                                        </label>
+                                    </div>
+                                    <div class="form-text">Uncheck to mark item as unavailable</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <a href="{{ url_for('admin.manage_menu') }}" class="btn btn-secondary me-md-2">
+                                        <i class="fas fa-times"></i> Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-plus"></i> Add Menu Item
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle"></i> Guidelines
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <strong>Name:</strong> Keep it concise and appetizing
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <strong>Price:</strong> Enter accurate pricing
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <strong>Description:</strong> Include ingredients and preparation style
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <strong>Image:</strong> High-quality photos work best
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <strong>Category:</strong> Choose the most appropriate category
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-image"></i> Image Requirements
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-dot-circle text-primary"></i>
+                            Supported formats: JPG, PNG, GIF
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-dot-circle text-primary"></i>
+                            Recommended size: 800x600 pixels
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-dot-circle text-primary"></i>
+                            Maximum file size: 15MB
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-dot-circle text-primary"></i>
+                            Square or landscape orientation works best
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('addMenuItemForm');
+    const priceInput = document.getElementById('price');
+    const nameInput = document.getElementById('name');
+    const imageInput = document.getElementById('image');
+
+    // Format price input to 2 decimal places
+    priceInput.addEventListener('blur', function() {
+        if (this.value) {
+            this.value = parseFloat(this.value).toFixed(2);
+        }
+    });
+
+    // Capitalize first letter of each word in name
+    nameInput.addEventListener('blur', function() {
+        if (this.value) {
+            this.value = this.value.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+        }
+    });
+
+    // Image file validation
+    imageInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const fileSize = file.size / 1024 / 1024; // Size in MB
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+            
+            if (!allowedTypes.includes(file.type)) {
+                alert('Please select a valid image file (JPG, PNG, or GIF)');
+                this.value = '';
+                return;
+            }
+            
+            if (fileSize > 15) {
+                alert('Image file size should not exceed 15MB');
+                this.value = '';
+                return;
+            }
+        }
+    });
+
+    // Form validation
+    form.addEventListener('submit', function(e) {
+        const name = nameInput.value.trim();
+        const price = priceInput.value;
+        const category = document.getElementById('category').value;
+        const description = document.getElementById('description').value.trim();
+
+        if (!name || !price || !category || !description) {
+            e.preventDefault();
+            alert('Please fill in all required fields');
+            return;
+        }
+
+        if (parseFloat(price) <= 0) {
+            e.preventDefault();
+            alert('Price must be greater than 0');
+            return;
+        }
+
+        // Show loading state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding Item...';
+    });
+});
+</script>
+{% endblock %}

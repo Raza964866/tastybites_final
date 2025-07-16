@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>TastyBites - Food Delivery</title>
+        <!-- Fixed CSS path with relative path -->
+        <link rel="stylesheet" href="../static/css/index.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    </head>
+<body>
+    <!-- Navigation Bar -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>TastyBites</h1>
+            </div>
+            <!-- Update the navigation links to remove .html extension -->
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/menu">Menu</a></li>
+                    <li><a href="/about">About Us</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="auth-buttons">
+                <a href="/login" class="btn btn-login">Login</a>
+                <a href="/sign-up" class="btn btn-signup">Sign Up</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../static/images/hero.png');">
+        <div class="container">
+            <div class="hero-content">
+                <h2>Delicious Food Delivered to Your Doorstep</h2>
+                <p>Fresh, fast, and always tasty</p>
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- Popular Dishes Section -->
+    <section class="popular-dishes">
+        <div class="container">
+            <h2 class="section-title">Popular Dishes</h2>
+            <div class="dishes-grid">
+                <div class="dish-card">
+                    <img src="../static/images/Buger.jpeg" alt="Classic Burger">
+                    <div class="dish-info">
+                        <h3>Classic Burger</h3>
+                        <p>Juicy beef patty with fresh vegetables</p>
+                        <div class="dish-footer">
+                            <span class="price">$12.99</span>
+                            <button class="btn btn-add">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="dish-card">
+                    <img src="../static/images/20250715_175011_Pari_-pari_Pizza.png" alt="Margherita Pizza">
+                    <div class="dish-info">
+                        <h3>Margherita Pizza</h3>
+                        <p>Fresh tomatoes, mozzarella, and basil</p>
+                        <div class="dish-footer">
+                            <span class="price">$15.99</span>
+                            <button class="btn btn-add">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="dish-card">
+                    <img src="../static/images/20250715_175551_Simple_Germany_salad.jpg" alt="Caesar Salad">
+                    <div class="dish-info">
+                        <h3>Caesar Salad</h3>
+                        <p>Crispy romaine with parmesan</p>
+                        <div class="dish-footer">
+                            <span class="price">$9.99</span>
+                            <button class="btn btn-add">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="dish-card">
+                    <img src="../static/images/20250715_175514_Russian_Salad.jpg" alt="Pasta Carbonara">
+                    <div class="dish-info">
+                        <h3>Pasta Carbonara</h3>
+                        <p>Creamy Salad with bacon</p>
+                        <div class="dish-footer">
+                            <span class="price">$14.99</span>
+                            <button class="btn btn-add">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="categories">
+        <div class="container">
+            <h2 class="section-title">Browse by Category</h2>
+            <div class="category-grid">
+                <div class="category-item">
+                    <div class="category-icon">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <h3>Noodles</h3>
+                </div>
+                <div class="category-item">
+                    <div class="category-icon">
+                        <i class="fas fa-hamburger"></i>
+                    </div>
+                    <h3>Burgers</h3>
+                </div>
+                <div class="category-item">
+                    <div class="category-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <h3>Salads</h3>
+                </div>
+                <div class="category-item">
+                    <div class="category-icon">
+                        <i class="fas fa-birthday-cake"></i>
+                    </div>
+                    <h3>Desserts</h3>
+                </div>
+                <div class="category-item">
+                    <div class="category-icon">
+                        <i class="fas fa-coffee"></i>
+                    </div>
+                    <h3>Beverages</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Special Offers Section -->
+    <section class="special-offers">
+        <div class="container">
+            <h2 class="section-title">Today's Special Offers</h2>
+            <div class="offers-grid">
+                <div class="offer-card">
+                    <img src="../static/images/Family Feast.jpg " alt="Family Feast">
+                    <div class="offer-info">
+                        <h3>Family Feast</h3>
+                        <p>Get 20% off on orders above $50</p>
+                        <a href="#" class="btn btn-offer">View Offer</a>
+                    </div>
+                </div>
+                <div class="offer-card">
+                    <img src="../static/images/Weekend Special.jpg" alt="Weekend Special">
+                    <div class="offer-info">
+                        <h3>Weekend Special</h3>
+                        <p>Free delivery on all orders</p>
+                        <a href="#" class="btn btn-offer">View Offer</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-about">
+                    <h3>TastyBites</h3>
+                    <p>Delivering happiness to your doorstep with our delicious and fresh food.</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Menu</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3>Contact Us</h3>
+                    <p>123 Food Street</p>
+                    <p>Cuisine City, FC 12345</p>
+                    <p>Phone: (555) 123-4567</p>
+                    <p>Email: info@tastybites.com</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 TastyBites. All rights reserved.</p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../static/js/main.js"></script>
+    <script>
+    // Main JavaScript file for TastyBites website
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize any JavaScript functionality here
+        console.log('TastyBites website loaded successfully!');
+        
+        // Add to cart functionality
+        const addToCartButtons = document.querySelectorAll('.btn-add');
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const dishName = this.closest('.dish-card').querySelector('h3').textContent;
+                alert(`${dishName} added to cart!`);
+                // In a real application, you would send this to a cart API
+            });
+        });
+    });
+    </script>
+</body>
+</html>

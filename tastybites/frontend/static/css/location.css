@@ -1,0 +1,266 @@
+/* Location Page Styles */
+.location-section {
+    min-height: 80vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    padding: 60px 0;
+}
+
+.location-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.location-header {
+    text-align: center;
+    padding: 40px 30px 30px;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    color: white;
+}
+
+.location-header i {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.location-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+.location-header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.location-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 0;
+    min-height: 500px;
+}
+
+.map-container {
+    position: relative;
+    background: #f8f9fa;
+}
+
+#map {
+    width: 100%;
+    height: 500px;
+    border: none;
+}
+
+.location-controls {
+    padding: 40px 30px;
+    background: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.btn {
+    padding: 15px 25px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+    color: white;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #1e7e34 0%, #155724 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.location-info {
+    text-align: center;
+}
+
+#location-status {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.selected-location {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    border: 2px solid #e9ecef;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.location-preview {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #333;
+}
+
+.location-preview i {
+    color: #ff6b6b;
+    font-size: 1.2rem;
+}
+
+.location-preview span {
+    font-weight: 500;
+}
+
+.location-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.location-buttons .btn {
+    width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .location-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .location-header {
+        padding: 30px 20px;
+    }
+    
+    .location-header h1 {
+        font-size: 2rem;
+    }
+    
+    .location-header i {
+        font-size: 2.5rem;
+    }
+    
+    .location-controls {
+        padding: 30px 20px;
+    }
+    
+    #map {
+        height: 400px;
+    }
+}
+
+@media (max-width: 480px) {
+    .location-section {
+        padding: 30px 15px;
+    }
+    
+    .location-container {
+        border-radius: 15px;
+    }
+    
+    .location-header {
+        padding: 25px 15px;
+    }
+    
+    .location-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .location-header p {
+        font-size: 1rem;
+    }
+    
+    .location-controls {
+        padding: 25px 15px;
+    }
+    
+    .btn {
+        padding: 12px 20px;
+        font-size: 0.9rem;
+    }
+    
+    #map {
+        height: 350px;
+    }
+}
+
+/* Loading animations */
+.fa-spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Map marker custom styling */
+.gm-style-iw {
+    border-radius: 10px;
+}
+
+/* Custom scrollbar for map */
+.gm-style::-webkit-scrollbar {
+    width: 8px;
+}
+
+.gm-style::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.gm-style::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.gm-style::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}

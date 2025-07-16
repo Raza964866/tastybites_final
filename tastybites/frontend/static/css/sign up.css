@@ -1,0 +1,204 @@
+/* Styles for register page */
+:root {
+    --primary-color: #ff4b4b;
+    --secondary-color: #ff8c42;
+    --dark-color: #1e2a38;
+    --light-color: #f9f9f9;
+    --gray-color: #f0f0f0;
+    --text-color: #333;
+    --white: #fff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--light-color);
+    height: 100vh;
+}
+
+.auth-container {
+    display: flex;
+    height: 100vh;
+}
+
+.left-panel {
+    flex: 1;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../images/food-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    color: var(--white);
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.logo a {
+    color: var(--white);
+    text-decoration: none;
+}
+
+.welcome-text {
+    margin-bottom: 100px;
+}
+
+.welcome-text h1 {
+    font-size: 36px;
+    margin-bottom: 20px;
+    line-height: 1.2;
+}
+
+.welcome-text p {
+    font-size: 18px;
+    opacity: 0.9;
+    margin-bottom: 10px;
+}
+
+.join-text {
+    margin-top: 20px;
+}
+
+.right-panel {
+    flex: 1;
+    background-color: var(--white);
+    padding: 40px;
+    overflow-y: auto;
+}
+
+.auth-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+}
+
+.nav-links a {
+    margin-right: 15px;
+    color: var(--dark-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.nav-links a:hover {
+    color: var(--primary-color);
+}
+
+.account-text a {
+    color: var(--primary-color);
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.auth-form {
+    max-width: 450px;
+    margin: 0 auto;
+}
+
+.auth-form h2 {
+    font-size: 28px;
+    margin-bottom: 10px;
+    color: var(--dark-color);
+}
+
+.subtitle {
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="tel"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.password-input {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #999;
+}
+
+.btn-create {
+    width: 100%;
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    padding: 14px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+.btn-create:hover {
+    background-color: var(--secondary-color);
+}
+
+.terms {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #666;
+}
+
+.terms a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+@media (max-width: 992px) {
+    .auth-container {
+        flex-direction: column;
+    }
+    
+    .left-panel {
+        flex: none;
+        height: 200px;
+    }
+    
+    .welcome-text {
+        margin-bottom: 0;
+    }
+    
+    .welcome-text h1 {
+        font-size: 28px;
+    }
+    
+    .right-panel {
+        padding: 30px 20px;
+    }
+}

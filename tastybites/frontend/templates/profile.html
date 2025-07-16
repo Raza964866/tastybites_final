@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - TastyBites</title>
+    <link rel="stylesheet" href="../static/css/index.css">
+    <link rel="stylesheet" href="../static/css/profile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>TastyBites</h1>
+            </div>
+            <nav>
+                <!-- <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="menu.html">Menu</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul> -->
+            </nav>
+            <div class="auth-buttons">
+                <a href="/logout" class="btn btn-login">Logout</a>
+                <div class="cart-icon">
+                    <a href="menu.html#cart-section"><i class="fas fa-shopping-cart"></i></a>
+                    <span id="cart-count" class="cart-count">0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Profile Section -->
+    <section class="profile-section">
+        <div class="container">
+            <div class="profile-header">
+                <h1>My Profile</h1>
+            </div>
+            
+            <div class="profile-content">
+                <div class="profile-sidebar">
+                    <div class="profile-info">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h2>{{ user.name }}</h2>
+                        <p>{{ user.email }}</p>
+                    </div>
+                    
+                    <div class="profile-menu">
+                        <a href="#account-details" class="active">Account Details</a>
+                        <a href="#order-history">Order History</a>
+                        <a href="#address">Delivery Address</a>
+                    </div>
+                </div>
+                
+                <div class="profile-main">
+                    <div id="account-details" class="profile-section-content active">
+                        <h2>Account Details</h2>
+                        <div class="account-info">
+                            <div class="info-group">
+                                <label>Full Name</label>
+                                <p>{{ user.name }}</p>
+                            </div>
+                            <div class="info-group">
+                                <label>Email Address</label>
+                                <p>{{ user.email }}</p>
+                            </div>
+                            <div class="info-group">
+                                <label>Phone Number</label>
+                                <p>{{ user.phone }}</p>
+                            </div>
+                            <div class="info-group">
+                                <label>Member Since</label>
+                                <p>{{ user.created_at.strftime('%B %d, %Y') }}</p>
+                            </div>
+                        </div>
+                        <button class="edit-btn">Edit Details</button>
+                    </div>
+                    
+                    <div id="order-history" class="profile-section-content">
+                        <h2>Order History</h2>
+                        {% if orders %}
+                            <div class="orders-list">
+                                {% for order in orders %}
+                                <div class="order-card">
+                                    <div class="order-header">
+                                        <div class="order-id">
+                                            <span>Order #{{ order.id }}</span>
+                                        </div>
+                                        <div class="order-date">
+                                            <span>{{ order.order_date.strftime('%B %d, %Y') }}</span>
+                                        </div>
+                                        <div class="order-status {{ order.status.lower() }}">
+                                            <span>{{ order.status }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="order-items">
+                                        {% for item in order.order_items %}
+                                        <div class="order-item">
+                                            <span class="item-name">{{ item.menu_item.name }}</span>
+                                            <span class="item-quantity">x{{ item.quantity }}</span>
+                                            <span class="item-price">${{ (item.price * item.quantity)|round(2) }}</span>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="order-footer">
+                                        <div class="order-total">
+                                            <span>Total:</span>
+                                            <span>${{ order.total_amount|round(2) }}</span>
+                                        </div>
+                                        <button class="reorder-btn">Reorder</button>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="no-orders">
+                                <p>You haven't placed any orders yet.</p>
+                                <a href="menu.html" class="browse-menu-btn">Browse Menu</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div id="address" class="profile-section-content">
+                        <h2>Delivery Address</h2>
+                        <div class="address-info">
+                            <p>{{ user.address }}</p>
+                        </div>
+                        <button class="edit-btn">Update Address</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>TastyBites</h2>
+                    <p>We deliver the best food right to your doorstep.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="menu.html">Menu</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="newsletter">
+                    <h3>Newsletter</h3>
+                    <p>Subscribe to get updates on our latest recipes.</p>
+                    <form>
+                        <input type="email" placeholder="Your email">
+                        <button type="submit">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 TastyBites. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../static/js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Profile tab navigation
+            const menuLinks = document.querySelectorAll('.profile-menu a');
+            const sectionContents = document.querySelectorAll('.profile-section-content');
+            
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all links and sections
+                    menuLinks.forEach(l => l.classList.remove('active'));
+                    sectionContents.forEach(s => s.classList.remove('active'));
+                    
+                    // Add active class to clicked link
+                    this.classList.add('active');
+                    
+                    // Show corresponding section
+                    const targetId = this.getAttribute('href').substring(1);
+                    document.getElementById(targetId).classList.add('active');
+                });
+            });
+            
+            // Reorder functionality
+            const reorderBtns = document.querySelectorAll('.reorder-btn');
+            reorderBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Get order items from the parent order card
+                    const orderCard = this.closest('.order-card');
+                    const orderItems = orderCard.querySelectorAll('.order-item');
+                    
+                    // Clear current cart
+                    cart = [];
+                    
+                    // Add items to cart
+                    orderItems.forEach(item => {
+                        const name = item.querySelector('.item-name').textContent;
+                        const quantity = parseInt(item.querySelector('.item-quantity').textContent.substring(1));
+                        const price = parseFloat(item.querySelector('.item-price').textContent.substring(1)) / quantity;
+                        
+                        cart.push({
+                            id: Math.floor(Math.random() * 1000), // Temporary ID
+                            name: name,
+                            price: price,
+                            quantity: quantity
+                        });
+                    });
+                    
+                    // Save cart to localStorage
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    
+                    // Redirect to menu page
+                    window.location.href = 'menu.html#cart-section';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

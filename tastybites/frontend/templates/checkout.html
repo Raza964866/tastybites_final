@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - TastyBites</title>
+    <link rel="stylesheet" href="../static/css/index.css">
+    <link rel="stylesheet" href="../static/css/checkout.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>TastyBites</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/menu">Menu</a></li>
+                    <li><a href="/about">About Us</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="auth-buttons">
+                {% if current_user.is_authenticated %}
+                <a href="/profile" class="btn btn-login">My Profile</a>
+                <a href="/logout" class="btn btn-signup">Logout</a>
+                {% else %}
+                <a href="/login" class="btn btn-login">Login</a>
+                <a href="/sign-up" class="btn btn-signup">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Checkout Section -->
+    <section class="checkout-section">
+        <div class="container">
+            <h1>Checkout</h1>
+            
+            <div class="checkout-container">
+                <div class="order-summary">
+                    <h2>Order Summary</h2>
+                    <div class="cart-items">
+                        {% if cart %}
+                            {% for item in cart %}
+                            <div class="cart-item">
+                                <div class="item-details">
+                                    <h3>{{ item.name }}</h3>
+                                    <p>Quantity: {{ item.quantity }}</p>
+                                </div>
+                                <div class="item-price">
+                                    ${{ (item.price * item.quantity) | round(2) }}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p>Your cart is empty</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="order-total">
+                        <h3>Total:</h3>
+                        <span>${{ total | round(2) }}</span>
+                    </div>
+                </div>
+                
+                <div class="checkout-form">
+                    <h2>Delivery Information</h2>
+                    <form id="order-form" action="/api/order/create" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <div class="form-group">
+                            <label for="name">Full Name *</label>
+                            <input type="text" id="name" name="name" value="{{ current_user.name }}" required>
+                            <small class="form-help">You can edit this information for delivery purposes</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email Address *</label>
+                            <input type="email" id="email" name="email" value="{{ current_user.email }}" required>
+                            <small class="form-help">We'll send order updates to this email</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Phone Number *</label>
+                            <input type="tel" id="phone" name="phone" value="{{ current_user.phone }}" required>
+                            <small class="form-help">Delivery person will contact you on this number</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="address">Delivery Address *</label>
+                            <textarea id="address" name="address" rows="3" required>{{ current_user.address }}</textarea>
+                            <small class="form-help">Detailed address including apartment/floor number</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Live Location</label>
+                            <div class="location-controls">
+                                <button type="button" id="open-location-modal" class="btn-get-location">📍 Share Live Location</button>
+                                <span id="location-status" class="location-status"></span>
+                            </div>
+                            <div class="location-fields">
+                                <input type="hidden" id="latitude" name="latitude">
+                                <input type="hidden" id="longitude" name="longitude">
+                                <div id="location-display" class="location-display"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="payment">Payment Method</label>
+                            <select id="payment" name="payment" required>
+                                <option value="" disabled selected>Select payment method</option>
+                                <option value="cash">Cash on Delivery</option>
+                                <option value="card">Credit/Debit Card</option>
+                            </select>
+                        </div>
+                        
+                        <div id="card-details" class="hidden">
+                            <div class="form-group">
+                                <label for="card-number">Card Number</label>
+                                <input type="text" id="card-number" name="card-number" placeholder="1234 5678 9012 3456">
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label for="expiry">Expiry Date</label>
+                                    <input type="text" id="expiry" name="expiry" placeholder="MM/YY">
+                                </div>
+                                
+                                <div class="form-group half">
+                                    <label for="cvv">CVV</label>
+                                    <input type="text" id="cvv" name="cvv" placeholder="123">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="notes">Special Instructions</label>
+                            <textarea id="notes" name="notes" rows="3" placeholder="Any special instructions for delivery or food preparation"></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn-place-order">Place Order</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>TastyBites</h2>
+                    <p>We deliver the best food right to your doorstep.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/about">About Us</a></li>
+                        <li><a href="/menu">Menu</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="newsletter">
+                    <h3>Newsletter</h3>
+                    <p>Subscribe to get updates on our latest recipes.</p>
+                    <form>
+                        <input type="email" id="newsletter-email" name="newsletter-email" placeholder="Your email">
+                        <button type="submit">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 TastyBites. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Live Location Modal -->
+    <div id="locationModal" class="location-modal" style="display: none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-map-marker-alt"></i> Share Your Live Location</h3>
+                <button class="modal-close" onclick="closeLocationModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>To ensure accurate delivery, please share your live location with us.</p>
+                <div id="map" style="height: 300px; width: 100%; border-radius: 8px;"></div>
+                <div class="location-actions">
+                    <button id="get-current-location" class="btn-primary">
+                        <i class="fas fa-crosshairs"></i> Use Current Location
+                    </button>
+                    <button id="confirm-location" class="btn-success" style="display: none;">
+                        <i class="fas fa-check"></i> Confirm Location
+                    </button>
+                </div>
+                <div id="selected-location" class="selected-location"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBUbHT5VcnoN4RWor4k60_6M3vvXtw-0qs&libraries=geometry"></script>
+    
+    <script>
+        let map, marker, currentLocation = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show/hide card details based on payment method selection
+            const paymentSelect = document.getElementById('payment');
+            const cardDetails = document.getElementById('card-details');
+            
+            paymentSelect.addEventListener('change', function() {
+                if (this.value === 'card') {
+                    cardDetails.classList.remove('hidden');
+                } else {
+                    cardDetails.classList.add('hidden');
+                }
+            });
+            
+            // Open location modal
+            document.getElementById('open-location-modal').addEventListener('click', function() {
+                openLocationModal();
+            });
+            
+            // Handle form submission
+            const orderForm = document.getElementById('order-form');
+            
+            orderForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Validate all required fields
+                const name = document.getElementById('name').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const phone = document.getElementById('phone').value.trim();
+                const address = document.getElementById('address').value.trim();
+                const paymentMethod = document.getElementById('payment').value;
+                const latitude = document.getElementById('latitude').value;
+                const longitude = document.getElementById('longitude').value;
+                
+                // Validate name
+                if (!name || name.length < 2) {
+                    alert('Please enter a valid full name (at least 2 characters).');
+                    document.getElementById('name').focus();
+                    return;
+                }
+                
+                // Validate email
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!email || !emailPattern.test(email)) {
+                    alert('Please enter a valid email address.');
+                    document.getElementById('email').focus();
+                    return;
+                }
+                
+                // Validate phone
+                const phonePattern = /^[+]?[0-9]{10,15}$/;
+                if (!phone || !phonePattern.test(phone.replace(/[\s\-()]/g, ''))) {
+                    alert('Please enter a valid phone number (10-15 digits).');
+                    document.getElementById('phone').focus();
+                    return;
+                }
+                
+                // Validate address
+                if (!address || address.length < 10) {
+                    alert('Please enter a detailed delivery address (at least 10 characters).');
+                    document.getElementById('address').focus();
+                    return;
+                }
+                
+                // Check payment method
+                if (!paymentMethod) {
+                    alert('Please select a payment method.');
+                    document.getElementById('payment').focus();
+                    return;
+                }
+                
+                // Validate card details if card payment is selected
+                if (paymentMethod === 'card') {
+                    const cardNumber = document.getElementById('card-number').value.trim();
+                    const expiry = document.getElementById('expiry').value.trim();
+                    const cvv = document.getElementById('cvv').value.trim();
+                    
+                    if (!cardNumber || cardNumber.replace(/[\s\-]/g, '').length < 13) {
+                        alert('Please enter a valid card number.');
+                        document.getElementById('card-number').focus();
+                        return;
+                    }
+                    
+                    if (!expiry || !/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)) {
+                        alert('Please enter expiry date in MM/YY format.');
+                        document.getElementById('expiry').focus();
+                        return;
+                    }
+                    
+                    if (!cvv || cvv.length < 3) {
+                        alert('Please enter a valid CVV.');
+                        document.getElementById('cvv').focus();
+                        return;
+                    }
+                }
+                
+                // Check if location is provided - MANDATORY
+                if (!latitude || !longitude) {
+                    alert('🌍 Location Required!\n\nYour live location is required for accurate delivery. Please click "Share Live Location" and confirm your location before placing the order.');
+                    openLocationModal();
+                    return;
+                }
+                
+                // Show loading state
+                const submitBtn = document.querySelector('.btn-place-order');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing Order...';
+                submitBtn.disabled = true;
+                
+                // Get cart items from server session
+                fetch('/api/cart')
+                .then(response => response.json())
+                .then(cartData => {
+                    const cart = cartData.cart || [];
+                    
+                    if (cart.length === 0) {
+                        alert('Your cart is empty. Please add items before placing an order.');
+                        return;
+                    }
+                    
+                    // Prepare order data
+                    const orderData = {
+                        items: cart,
+                        payment_method: paymentSelect.value,
+                        notes: document.getElementById('notes').value,
+                        latitude: parseFloat(latitude),
+                        longitude: parseFloat(longitude)
+                    };
+                    
+                    // Send AJAX request to create order
+                    fetch('/api/order/create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify(orderData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Redirect to receipt page
+                            window.location.href = '/receipt/' + data.order_id;
+                        } else {
+                            alert('Error: ' + data.message);
+                            // Reset button state
+                            submitBtn.innerHTML = originalText;
+                            submitBtn.disabled = false;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while placing your order. Please try again.');
+                        // Reset button state
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    });
+                })
+                .catch(error => {
+                    console.error('Error getting cart:', error);
+                    alert('Unable to retrieve cart data. Please try again.');
+                });
+            });
+        });
+        
+        function openLocationModal() {
+            document.getElementById('locationModal').style.display = 'flex';
+            initMap();
+        }
+        
+        function closeLocationModal() {
+            document.getElementById('locationModal').style.display = 'none';
+        }
+        
+        function initMap() {
+            // Default location (you can change this to your restaurant's location)
+            const defaultLocation = { lat: 24.8607, lng: 67.0011 }; // Karachi, Pakistan
+            
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 15,
+                center: defaultLocation,
+                mapTypeControl: false,
+                streetViewControl: false
+            });
+            
+            marker = new google.maps.Marker({
+                position: defaultLocation,
+                map: map,
+                draggable: true,
+                title: 'Your Delivery Location'
+            });
+            
+            // Handle marker drag
+            marker.addListener('dragend', function() {
+                const position = marker.getPosition();
+                updateLocation(position.lat(), position.lng());
+            });
+            
+            // Handle map click
+            map.addListener('click', function(event) {
+                marker.setPosition(event.latLng);
+                updateLocation(event.latLng.lat(), event.latLng.lng());
+            });
+            
+            // Get current location button
+            document.getElementById('get-current-location').addEventListener('click', function() {
+                getCurrentLocation();
+            });
+            
+            // Confirm location button
+            document.getElementById('confirm-location').addEventListener('click', function() {
+                if (currentLocation) {
+                    document.getElementById('latitude').value = currentLocation.lat;
+                    document.getElementById('longitude').value = currentLocation.lng;
+                    
+                    // Update status
+                    document.getElementById('location-status').textContent = 'Live location confirmed!';
+                    document.getElementById('location-status').className = 'location-status success';
+                    
+                    // Update display
+                    document.getElementById('location-display').innerHTML = `
+                        <div class="location-info">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Live location confirmed</span>
+                            <small>Lat: ${currentLocation.lat.toFixed(6)}, Lng: ${currentLocation.lng.toFixed(6)}</small>
+                        </div>
+                    `;
+                    
+                    closeLocationModal();
+                } else {
+                    alert('Please select a location first.');
+                }
+            });
+        }
+        
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        const location = { lat, lng };
+                        
+                        map.setCenter(location);
+                        marker.setPosition(location);
+                        updateLocation(lat, lng);
+                    },
+                    function(error) {
+                        alert('Unable to get your current location. Please select manually on the map.');
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            } else {
+                alert('Geolocation is not supported by this browser.');
+            }
+        }
+        
+        function updateLocation(lat, lng) {
+            currentLocation = { lat, lng };
+            
+            // Show confirm button
+            document.getElementById('confirm-location').style.display = 'inline-block';
+            
+            // Update location display
+            document.getElementById('selected-location').innerHTML = `
+                <div class="location-preview">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Selected Location: ${lat.toFixed(6)}, ${lng.toFixed(6)}</span>
+                </div>
+            `;
+        }
+        
+        // Close modal when clicking overlay
+        document.querySelector('.modal-overlay').addEventListener('click', closeLocationModal);
+    </script>
+</body>
+</html>

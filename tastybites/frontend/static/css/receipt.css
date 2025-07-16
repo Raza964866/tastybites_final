@@ -1,0 +1,216 @@
+/* Receipt Page Styles */
+.receipt-section {
+    padding: 50px 0;
+    background-color: var(--light-color);
+}
+
+.receipt-container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    margin: 0 auto;
+    max-width: 800px;
+}
+
+.receipt-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.receipt-logo h2 {
+    font-size: 2rem;
+    color: var(--primary-color);
+}
+
+.receipt-title {
+    text-align: right;
+}
+
+.receipt-title h1 {
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+    color: var(--dark-color);
+}
+
+.receipt-title p {
+    color: #666;
+}
+
+.receipt-details {
+    margin-bottom: 30px;
+}
+
+.receipt-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+.info-group {
+    flex: 1;
+}
+
+.info-group h3 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    color: var(--dark-color);
+}
+
+.info-group p {
+    margin-bottom: 8px;
+    color: #555;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.status-badge.pending {
+    background-color: #FFF3CD;
+    color: #856404;
+}
+
+.status-badge.processing {
+    background-color: #D1ECF1;
+    color: #0C5460;
+}
+
+.status-badge.delivered {
+    background-color: #D4EDDA;
+    color: #155724;
+}
+
+.status-badge.cancelled {
+    background-color: #F8D7DA;
+    color: #721C24;
+}
+
+.order-items h3 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    color: var(--dark-color);
+}
+
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.items-table th {
+    background-color: #f8f9fa;
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.items-table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.items-table tfoot td {
+    padding: 12px;
+    font-weight: 600;
+}
+
+.items-table .total-row td {
+    font-size: 1.1rem;
+    color: var(--primary-color);
+    border-top: 2px solid #eee;
+}
+
+.receipt-footer {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.receipt-footer p {
+    margin-bottom: 20px;
+    color: #666;
+}
+
+.receipt-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.receipt-actions .btn {
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.receipt-actions .btn:first-child {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+}
+
+.receipt-actions .btn:first-child:hover {
+    background-color: var(--primary-dark);
+}
+
+.receipt-actions .btn:nth-child(2) {
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+}
+
+.receipt-actions .btn:nth-child(2):hover {
+    background-color: var(--secondary-dark);
+}
+
+.receipt-actions .btn:last-child {
+    background-color: #f8f9fa;
+    color: var(--dark-color);
+    border: 1px solid #ddd;
+}
+
+.receipt-actions .btn:last-child:hover {
+    background-color: #e9ecef;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .receipt-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .receipt-title {
+        text-align: center;
+        margin-top: 15px;
+    }
+    
+    .receipt-info {
+        flex-direction: column;
+    }
+    
+    .info-group {
+        margin-bottom: 20px;
+    }
+    
+    .receipt-actions {
+        flex-direction: column;
+    }
+    
+    .receipt-actions .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}

@@ -1,0 +1,82 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Edit Menu Item{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">Edit Menu Item</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <div class="form-group mb-3">
+                        <label for="name" class="form-label">Item Name</label>
+                        <input type="text" class="form-control" id="name" name="name" 
+                               value="{{ item.name }}" required>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" 
+                                  rows="3" required>{{ item.description }}</textarea>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="price" class="form-label">Price ($)</label>
+                        <input type="number" class="form-control" id="price" name="price" 
+                               value="{{ item.price }}" step="0.01" min="0" required>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="category" class="form-label">Category</label>
+                        <select class="form-select" id="category" name="category" required>
+                            <option value="">Select Category</option>
+                            <option value="Pizza" {% if item.category == 'Pizza' %}selected{% endif %}>Pizza</option>
+                            <option value="Burgers" {% if item.category == 'Burgers' %}selected{% endif %}>Burgers</option>
+                            <option value="Desserts" {% if item.category == 'Desserts' %}selected{% endif %}>Desserts</option>
+                            <option value="Salads" {% if item.category == 'Salads' %}selected{% endif %}>Salads</option>
+                            <option value="Deals" {% if item.category == 'Deals' %}selected{% endif %}>Deals</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="image" class="form-label">Image</label>
+                        <input type="file" class="form-control" id="image" name="image" 
+                               accept="image/*">
+                        <small class="form-text text-muted">Leave empty to keep current image</small>
+                        {% if item.image %}
+                        <div class="mt-2">
+                            <img src="{{ item.image_url }}" alt="{{ item.name }}" 
+                                 class="img-thumbnail" style="width: 100px; height: 100px; object-fit: cover;">
+                            <p class="text-muted small mt-1">Current image</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="is_available" 
+                                   name="is_available" {% if item.is_available %}checked{% endif %}>
+                            <label class="form-check-label" for="is_available">
+                                Available for ordering
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Update Item
+                        </button>
+                        <a href="{{ url_for('admin.manage_menu') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

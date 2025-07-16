@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Receipt - TastyBites</title>
+    <link rel="stylesheet" href="../static/css/index.css">
+    <link rel="stylesheet" href="../static/css/receipt.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>TastyBites</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/menu">Menu</a></li>
+                    <li><a href="/about">About Us</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="auth-buttons">
+                {% if current_user.is_authenticated %}
+                <a href="/profile" class="btn btn-login">My Profile</a>
+                <a href="/logout" class="btn btn-signup">Logout</a>
+                {% else %}
+                <a href="/login" class="btn btn-login">Login</a>
+                <a href="/sign-up" class="btn btn-signup">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Receipt Section -->
+    <section class="receipt-section">
+        <div class="container">
+            <div class="receipt-container">
+                <div class="receipt-header">
+                    <div class="receipt-logo">
+                        <h2>TastyBites</h2>
+                    </div>
+                    <div class="receipt-title">
+                        <h1>Order Receipt</h1>
+                        <p>Thank you for your order!</p>
+                    </div>
+                </div>
+                
+                <div class="receipt-details">
+                    <div class="receipt-info">
+                        <div class="info-group">
+                            <h3>Order Information</h3>
+                            <p><strong>Order ID:</strong> #{{ order.id }}</p>
+                            <p><strong>Date:</strong> {{ order.order_date.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                            <p><strong>Status:</strong> <span class="status-badge {{ order.status.lower() }}">{{ order.status }}</span></p>
+                        </div>
+                        
+                        <div class="info-group">
+                            <h3>Customer Information</h3>
+                            <p><strong>Name:</strong> {{ current_user.name }}</p>
+                            <p><strong>Email:</strong> {{ current_user.email }}</p>
+                            <p><strong>Phone:</strong> {{ current_user.phone }}</p>
+                            <p><strong>Delivery Address:</strong> {{ current_user.address }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="order-items">
+                        <h3>Order Items</h3>
+                        <table class="items-table">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in items %}
+                                <tr>
+                                    <td>{{ item.name }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>${{ item.price }}</td>
+                                    <td>${{ item.total }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3">Subtotal</td>
+                                    <td>${{ order.total_amount }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3">Delivery Fee</td>
+                                    <td>$0.00</td>
+                                </tr>
+                                <tr class="total-row">
+                                    <td colspan="3">Total</td>
+                                    <td>${{ order.total_amount }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="receipt-footer">
+                    <p>Your order is being prepared and will be delivered soon. You can track your order status in your profile.</p>
+                    <div class="receipt-actions">
+                        <a href="/menu" class="btn">Order More</a>
+                        <a href="/profile" class="btn">View Profile</a>
+                        <button class="btn" onclick="window.print()">Print Receipt</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="no-print">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>TastyBites</h2>
+                    <p>We deliver the best food right to your doorstep.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/about">About Us</a></li>
+                        <li><a href="/menu">Menu</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="newsletter">
+                    <h3>Newsletter</h3>
+                    <p>Subscribe to get updates on our latest recipes.</p>
+                    <form>
+                        <input type="email" placeholder="Your email">
+                        <button type="submit">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 TastyBites. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <style>
+        /* Print styles */
+        @media print {
+            .no-print {
+                display: none;
+            }
+            
+            header, footer, .receipt-actions {
+                display: none;
+            }
+            
+            .receipt-container {
+                box-shadow: none;
+                margin: 0;
+                padding: 0;
+            }
+            
+            body {
+                font-size: 12pt;
+            }
+        }
+    </style>
+</body>
+</html>

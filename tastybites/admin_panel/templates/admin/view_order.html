@@ -1,0 +1,877 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Order #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3">Order #{{ order.id }}</h1>
+            <div>
+                <a href="{{ url_for('admin.manage_orders') }}" class="btn btn-outline-secondary me-2">
+                    <i class="fas fa-arrow-left"></i> Back to Orders
+                </a>
+                <button class="btn btn-primary" onclick="printSection('print-order')">
+                    <i class="fas fa-print"></i> Print Order
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Order Items</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order.order_items %}
+                            <tr>
+                                <td>
+                                    <strong>{{ item.menu_item.name }}</strong><br>
+                                    <small class="text-muted">{{ item.menu_item.description|truncate(50) }}</small>
+                                </td>
+                                <td>${{ "%.2f"|format(item.price) }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>${{ "%.2f"|format(item.price * item.quantity) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Subtotal:</strong></td>
+                                <td>${{ "%.2f"|format(order.total_amount) }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Tax:</strong></td>
+                                <td>${{ "%.2f"|format(order.total_amount * 0.1) }}</td>
+                            </tr>
+                            <tr class="table-active">
+                                <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                <td><strong>${{ "%.2f"|format(order.total_amount * 1.1) }}</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Order Notes</h5>
+            </div>
+            <div class="card-body">
+                {% if order.notes %}
+                    <p>{{ order.notes }}</p>
+                {% else %}
+                    <p class="text-muted">No special instructions provided.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Order Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6>Order Status</h6>
+                    <form method="POST" action="{{ url_for('admin.update_order_status', order_id=order.id) }}" class="mb-3">
+                        <select id="orderStatus" name="status" class="form-select" onchange="this.form.submit()">
+                            <option value="Pending" {% if order.status == 'Pending' %}selected{% endif %}>Pending</option>
+                            <option value="Confirmed" {% if order.status == 'Confirmed' %}selected{% endif %}>Confirmed</option>
+                            <option value="Preparing" {% if order.status == 'Preparing' %}selected{% endif %}>Preparing</option>
+                            <option value="Ready" {% if order.status == 'Ready' %}selected{% endif %}>Ready for Pickup/Delivery</option>
+                            <option value="Delivered" {% if order.status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                            <option value="Cancelled" {% if order.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                        </select>
+                    </form>
+                </div>
+
+                <div class="mb-3">
+                    <h6>Order Information</h6>
+                    <ul class="list-unstyled">
+                        <li><strong>Order ID:</strong> #{{ order.id }}</li>
+                        <li><strong>Order Date:</strong> {{ order.order_date.strftime('%B %d, %Y %I:%M %p') }}</li>
+                        <li><strong>Status:</strong> 
+                            <span class="badge bg-{{ 'success' if order.status == 'Delivered' else 'warning' if order.status == 'Pending' else 'info' }}">
+                                {{ order.status }}
+                            </span>
+                        </li>
+                        <li><strong>Payment Status:</strong> 
+                            <span class="badge bg-{{ 'success' if order.payment_status == 'Paid' else 'danger' }}">
+                                {{ order.payment_status or 'Pending' }}
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="mb-3">
+                    <h6>Customer Information</h6>
+                    <address>
+                        <strong>{{ order.user.name }}</strong><br>
+                        {{ order.user.email }}<br>
+                        {{ order.user.phone or 'N/A' }}<br>
+                        {{ order.delivery_address or order.user.address or 'No delivery address provided' }}
+                    </address>
+                </div>
+
+
+                <div class="d-grid gap-2">
+                    <a href="mailto:{{ order.user.email }}?subject=Order%20%23{{ order.id }}%20Update" class="btn btn-outline-primary">
+                        <i class="fas fa-envelope me-1"></i> Contact Customer
+                    </a>
+                    {% if order.status != 'Delivered' and order.status != 'Cancelled' %}
+                        <a href="#" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelOrderModal">
+                            <i class="fas fa-times me-1"></i> Cancel Order
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Order Timeline</h5>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-point"></div>
+                        <div class="timeline-content">
+                            <h6>Order Placed</h6>
+                            <p class="text-muted">{{ order.order_date.strftime('%B %d, %Y %I:%M %p') }}</p>
+                        </div>
+                    </div>
+                    {% if order.status == 'Confirmed' or order.status == 'Preparing' or order.status == 'Ready' or order.status == 'Delivered' %}
+                    <div class="timeline-item">
+                        <div class="timeline-point"></div>
+                        <div class="timeline-content">
+                            <h6>Order Confirmed</h6>
+                            <p class="text-muted">{{ order.updated_at.strftime('%B %d, %Y %I:%M %p') }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if order.status == 'Preparing' or order.status == 'Ready' or order.status == 'Delivered' %}
+                    <div class="timeline-item">
+                        <div class="timeline-point"></div>
+                        <div class="timeline-content">
+                            <h6>Preparing Your Order</h6>
+                            <p class="text-muted">Your delicious food is being prepared</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if order.status == 'Ready' or order.status == 'Delivered' %}
+                    <div class="timeline-item">
+                        <div class="timeline-point"></div>
+                        <div class="timeline-content">
+                            <h6>Ready for Pickup/Delivery</h6>
+                            <p class="text-muted">Your order is ready</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if order.status == 'Delivered' %}
+                    <div class="timeline-item">
+                        <div class="timeline-point"></div>
+                        <div class="timeline-content">
+                            <h6>Order Delivered</h6>
+                            <p class="text-muted">Enjoy your meal!</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if order.status == 'Cancelled' %}
+                    <div class="timeline-item">
+                        <div class="timeline-point bg-danger"></div>
+                        <div class="timeline-content">
+                            <h6>Order Cancelled</h6>
+                            <p class="text-muted">Order was cancelled</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Print Section (Hidden by default) -->
+<div id="print-order" class="d-none">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2>TastyBites</h2>
+            <p class="mb-0">123 Food Street, Cuisine City</p>
+            <p>Phone: (123) 456-7890 | Email: info@tastybites.com</p>
+            <h4 class="mt-4">ORDER #{{ order.id }}</h4>
+            <p>{{ order.order_date.strftime('%B %d, %Y %I:%M %p') }}</p>
+            <hr>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h5>Customer Information</h5>
+                <p class="mb-1"><strong>{{ order.user.name }}</strong></p>
+                <p class="mb-1">{{ order.user.email }}</p>
+                <p class="mb-1">{{ order.user.phone or 'N/A' }}</p>
+                {% if order.delivery_address %}
+                <p class="mb-0">{{ order.delivery_address }}</p>
+                {% endif %}
+            </div>
+            <div class="col-md-6 text-md-end">
+                <h5>Order Status</h5>
+                <p class="mb-1"><strong>Status:</strong> {{ order.status }}</p>
+                <p class="mb-0"><strong>Payment:</strong> {{ order.payment_status or 'Pending' }}</p>
+            </div>
+        </div>
+
+        <div class="table-responsive mb-4">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th class="text-end">Price</th>
+                        <th class="text-center">Qty</th>
+                        <th class="text-end">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.order_items %}
+                    <tr>
+                        <td>{{ item.menu_item.name }}</td>
+                        <td class="text-end">${{ "%.2f"|format(item.price) }}</td>
+                        <td class="text-center">{{ item.quantity }}</td>
+                        <td class="text-end">${{ "%.2f"|format(item.price * item.quantity) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="text-end"><strong>Subtotal:</strong></td>
+                        <td class="text-end">${{ "%.2f"|format(order.total_amount) }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="text-end"><strong>Tax (10%):</strong></td>
+                        <td class="text-end">${{ "%.2f"|format(order.total_amount * 0.1) }}</td>
+                    </tr>
+                    <tr class="table-active">
+                        <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                        <td class="text-end"><strong>${{ "%.2f"|format(order.total_amount * 1.1) }}</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        {% if order.notes %}
+        <div class="mb-4">
+            <h5>Special Instructions</h5>
+            <p>{{ order.notes }}</p>
+        </div>
+        {% endif %}
+
+        <div class="text-center mt-5">
+            <p>Thank you for choosing TastyBites!</p>
+            <p>For any questions, please call (123) 456-7890</p>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Order Modal -->
+<div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancelOrderModalLabel">Cancel Order #{{ order.id }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('admin.update_order_status', order_id=order.id) }}">
+                <input type="hidden" name="status" value="Cancelled">
+                <div class="modal-body">
+                    <p>Are you sure you want to cancel this order? This action cannot be undone.</p>
+                    <div class="mb-3">
+                        <label for="cancelReason" class="form-label">Reason for cancellation (optional):</label>
+                        <textarea class="form-control" id="cancelReason" name="cancel_reason" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger">Cancel Order</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<!-- Google Maps API -->
+<script src="https://maps.googleapis.com/maps/api/js?key={{ config.GOOGLE_MAPS_API_KEY }}&libraries=geometry"></script>
+
+<script>
+// Print order function
+function printSection(sectionId) {
+    const printContent = document.getElementById(sectionId);
+    const printWindow = window.open('', '', 'width=800,height=600');
+    
+    printWindow.document.write(`
+        <html>
+            <head>
+                <title>Order #{{ order.id }} - TastyBites</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+                <style>
+                    @media print {
+                        @page { margin: 0; }
+                        body { margin: 1.6cm; }
+                        .no-print { display: none !important; }
+                    }
+                    .table { width: 100%; margin-bottom: 1rem; color: #212529; }
+                    .table th, .table td { padding: 0.75rem; vertical-align: top; border-top: 1px solid #dee2e6; }
+                    .table thead th { vertical-align: bottom; border-bottom: 2px solid #dee2e6; }
+                    .table-bordered { border: 1px solid #dee2e6; }
+                    .table-bordered th, .table-bordered td { border: 1px solid #dee2e6; }
+                    .text-end { text-align: right !important; }
+                    .text-center { text-align: center !important; }
+                    .mb-4 { margin-bottom: 1.5rem !important; }
+                    .mt-4 { margin-top: 1.5rem !important; }
+                    .mt-5 { margin-top: 3rem !important; }
+                    .table-active { background-color: rgba(0,0,0,.075); }
+                </style>
+            </head>
+            <body>
+                ${printContent.innerHTML}
+                <div class="no-print text-center mt-4">
+                    <button class="btn btn-primary" onclick="window.print()">Print</button>
+                    <button class="btn btn-secondary ms-2" onclick="window.close()">Close</button>
+                </div>
+                <script>
+                    // Auto-print when the window loads
+                    window.onload = function() {
+                        setTimeout(function() {
+                            window.print();
+                        }, 200);
+                    };
+                </script>
+            </body>
+        </html>
+    `);
+    
+    printWindow.document.close();
+}
+
+// Live tracking function
+function trackLiveLocation(customerLat, customerLng) {
+    // Open a new window/tab with Google Maps showing route from restaurant to customer
+    const restaurantLat = 24.8607; // Your restaurant's latitude
+    const restaurantLng = 67.0011; // Your restaurant's longitude
+    
+    // Create Google Maps URL with directions
+    const mapsUrl = `https://www.google.com/maps/dir/${restaurantLat},${restaurantLng}/${customerLat},${customerLng}`;
+    
+    // Open in new tab
+    window.open(mapsUrl, '_blank');
+    
+    // Optionally, you can also show a modal with embedded map
+    showTrackingModal(customerLat, customerLng);
+}
+
+// Show tracking modal with live map
+function showTrackingModal(customerLat, customerLng) {
+    // Remove any existing modal first
+    const existingModal = document.getElementById('trackingModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Create modal HTML with proper structure
+    const modalHTML = `
+        <div class="modal fade" id="trackingModal" tabindex="-1" aria-labelledby="trackingModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="trackingModalLabel">
+                            <i class="fas fa-route me-2"></i>Live Location Tracking - Order #{{ order.id }}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-0">
+                        <div id="trackingMap" style="height: 500px; width: 100%; background: #f0f0f0; display: flex; align-items: center; justify-content: center;">
+                            <div class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading map...</span>
+                                </div>
+                                <p class="mt-2 text-muted">Loading map...</p>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-light">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-store text-primary me-2"></i>
+                                        <div>
+                                            <h6 class="mb-0">Restaurant Location</h6>
+                                            <small class="text-muted">TastyBites Restaurant</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-map-marker-alt text-danger me-2"></i>
+                                        <div>
+                                            <h6 class="mb-0">Customer Location</h6>
+                                            <small class="text-muted">{{ order.user.name }}</small>
+                                            <br><small class="text-muted">Lat: ${customerLat.toFixed(6)}, Lng: ${customerLng.toFixed(6)}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Close
+                        </button>
+                        <a href="https://www.google.com/maps/dir/24.8607,67.0011/${customerLat},${customerLng}" 
+                           target="_blank" class="btn btn-primary">
+                            <i class="fas fa-external-link-alt me-1"></i> Open in Google Maps
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remove existing modal if any
+    const existingModal = document.getElementById('trackingModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Add modal to body
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('trackingModal'));
+    modal.show();
+    
+    // Initialize map when modal is shown
+    document.getElementById('trackingModal').addEventListener('shown.bs.modal', function() {
+        initTrackingMap(customerLat, customerLng);
+    });
+}
+
+// Global variables for tracking
+let trackingMap;
+let trackingMarkers = {};
+let directionsRenderer;
+let trackingInterval;
+let lastUpdateTime = new Date();
+
+// Format time for display
+function formatTime(date) {
+    return date.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+    });
+}
+
+// Update the last updated time display
+function updateLastUpdated() {
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - lastUpdateTime) / 1000);
+    
+    let displayText;
+    if (diffInSeconds < 60) {
+        displayText = 'Just now';
+    } else if (diffInSeconds < 3600) {
+        const minutes = Math.floor(diffInSeconds / 60);
+        displayText = `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
+    } else {
+        displayText = formatTime(lastUpdateTime);
+    }
+    
+    document.getElementById('lastUpdated').textContent = displayText;
+}
+
+// Initialize tracking map
+function initTrackingMap(customerLat, customerLng, deliveryPersonLat = null, deliveryPersonLng = null) {
+    const restaurantLocation = { lat: 24.8607, lng: 67.0011 };
+    const customerLocation = { lat: customerLat, lng: customerLng };
+    
+    // Create map
+    trackingMap = new google.maps.Map(document.getElementById('trackingMap'), {
+        zoom: 13,
+        center: restaurantLocation,
+        mapTypeControl: true,
+        streetViewControl: true,
+        fullscreenControl: true,
+        mapTypeControlOptions: {
+            style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+            position: google.maps.ControlPosition.TOP_RIGHT
+        },
+        zoomControlOptions: {
+            position: google.maps.ControlPosition.RIGHT_CENTER
+        }
+    });
+    
+    // Initialize directions renderer
+    directionsRenderer = new google.maps.DirectionsRenderer({
+        suppressMarkers: true,
+        polylineOptions: {
+            strokeColor: '#e74c3c',
+            strokeWeight: 4,
+            strokeOpacity: 0.8
+        }
+    });
+    
+    directionsRenderer.setMap(trackingMap);
+    
+    // Add restaurant marker
+    trackingMarkers.restaurant = addMarker(restaurantLocation, {
+        title: 'TastyBites Restaurant',
+        icon: {
+            url: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+            scaledSize: new google.maps.Size(40, 40)
+        },
+        infoWindow: {
+            content: `
+                <div style="padding: 10px;">
+                    <h6 style="margin: 0 0 5px 0; color: #2c3e50;">
+                        <i class="fas fa-store"></i> TastyBites Restaurant
+                    </h6>
+                    <p style="margin: 0; font-size: 12px; color: #7f8c8d;">Starting Point</p>
+                </div>
+            `
+        }
+    });
+    
+    // Add customer marker
+    trackingMarkers.customer = addMarker(customerLocation, {
+        title: `Customer: {{ order.user.name }}`,
+        icon: {
+            url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
+            scaledSize: new google.maps.Size(40, 40)
+        },
+        infoWindow: {
+            content: `
+                <div style="padding: 10px;">
+                    <h6 style="margin: 0 0 5px 0; color: #2c3e50;">
+                        <i class="fas fa-map-marker-alt"></i> {{ order.user.name }}
+                    </h6>
+                    <p style="margin: 0; font-size: 12px; color: #7f8c8d;">Delivery Location</p>
+                    <p style="margin: 5px 0 0 0; font-size: 11px; color: #95a5a6;">
+                        Lat: ${customerLat.toFixed(6)}, Lng: ${customerLng.toFixed(6)}
+                    </p>
+                </div>
+            `
+        }
+    });
+    
+    // Add delivery person marker if location is available
+    if (deliveryPersonLat && deliveryPersonLng) {
+        updateDeliveryPersonMarker(deliveryPersonLat, deliveryPersonLng);
+    }
+    
+    // Calculate and display route
+    updateRoute(restaurantLocation, customerLocation);
+    
+    // Fit map to show all markers
+    fitMapToMarkers();
+    
+    // Start tracking updates
+    startTrackingUpdates();
+}
+
+// Add a marker to the map
+function addMarker(position, options = {}) {
+    const marker = new google.maps.Marker({
+        position: position,
+        map: trackingMap,
+        title: options.title || '',
+        icon: options.icon || null
+    });
+    
+    if (options.infoWindow) {
+        const infoWindow = new google.maps.InfoWindow({
+            content: options.infoWindow.content
+        });
+        
+        marker.addListener('click', () => {
+            // Close all other info windows
+            Object.values(trackingMarkers).forEach(m => {
+                if (m.infoWindow) m.infoWindow.close();
+            });
+            
+            // Open this info window
+            infoWindow.open(trackingMap, marker);
+        });
+        
+        // Add infoWindow reference to marker
+        marker.infoWindow = infoWindow;
+    }
+    
+    return marker;
+}
+
+// Update the delivery person's marker
+function updateDeliveryPersonMarker(lat, lng) {
+    const position = { lat: parseFloat(lat), lng: parseFloat(lng) };
+    
+    if (trackingMarkers.deliveryPerson) {
+        // Update existing marker position
+        trackingMarkers.deliveryPerson.setPosition(position);
+    } else {
+        // Create new marker
+        trackingMarkers.deliveryPerson = addMarker(position, {
+            title: 'Delivery Person',
+            icon: {
+                url: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png',
+                scaledSize: new google.maps.Size(40, 40)
+            },
+            infoWindow: {
+                content: `
+                    <div style="padding: 10px;">
+                        <h6 style="margin: 0 0 5px 0; color: #2c3e50;">
+                            <i class="fas fa-motorcycle"></i> Delivery Person
+                        </h6>
+                        <p style="margin: 0; font-size: 12px; color: #7f8c8d;">
+                            Current Location
+                        </p>
+                        <p style="margin: 5px 0 0 0; font-size: 11px; color: #95a5a6;">
+                            Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}
+                        </p>
+                    </div>
+                `
+            }
+        });
+    }
+    
+    // Update the route if needed
+    if (trackingMarkers.restaurant && trackingMarkers.customer) {
+        updateRoute(trackingMarkers.restaurant.getPosition(), trackingMarkers.customer.getPosition());
+    }
+    
+    // Update last updated time
+    lastUpdateTime = new Date();
+    updateLastUpdated();
+    
+    return trackingMarkers.deliveryPerson;
+}
+
+// Update the route on the map
+function updateRoute(origin, destination) {
+    if (!directionsRenderer) return;
+    
+    const directionsService = new google.maps.DirectionsService();
+    
+    // If we have a delivery person, show route from delivery person to customer
+    // Otherwise show route from restaurant to customer
+    const startPoint = trackingMarkers.deliveryPerson ? 
+        trackingMarkers.deliveryPerson.getPosition() : origin;
+    
+    directionsService.route({
+        origin: startPoint,
+        destination: destination,
+        travelMode: google.maps.TravelMode.DRIVING
+    }, (result, status) => {
+        if (status === 'OK') {
+            directionsRenderer.setDirections(result);
+            
+            // If we have a delivery person, also show ETA
+            if (trackingMarkers.deliveryPerson) {
+                const route = result.routes[0];
+                const leg = route.legs[0];
+                
+                // Update delivery person's info window with ETA
+                if (trackingMarkers.deliveryPerson.infoWindow) {
+                    const durationText = leg.duration ? leg.duration.text : 'calculating...';
+                    const distanceText = leg.distance ? leg.distance.text : '';
+                    
+                    trackingMarkers.deliveryPerson.infoWindow.setContent(`
+                        <div style="padding: 10px;">
+                            <h6 style="margin: 0 0 5px 0; color: #2c3e50;">
+                                <i class="fas fa-motorcycle"></i> Delivery Person
+                            </h6>
+                            <p style="margin: 0 0 5px 0; font-size: 12px; color: #7f8c8d;">
+                                <i class="fas fa-clock"></i> ETA: ${durationText}
+                            </p>
+                            <p style="margin: 0 0 5px 0; font-size: 12px; color: #7f8c8d;">
+                                <i class="fas fa-route"></i> ${distanceText} to destination
+                            </p>
+                            <p style="margin: 5px 0 0 0; font-size: 11px; color: #95a5a6;">
+                                Last updated: ${formatTime(new Date())}
+                            </p>
+                        </div>
+                    `);
+                }
+            }
+        }
+    });
+}
+
+// Fit map to show all markers
+function fitMapToMarkers() {
+    const bounds = new google.maps.LatLngBounds();
+    
+    // Add all markers to bounds
+    Object.values(trackingMarkers).forEach(marker => {
+        bounds.extend(marker.getPosition());
+    });
+    
+    // Only fit bounds if we have valid bounds
+    if (!bounds.isEmpty()) {
+        // Add some padding
+        trackingMap.fitBounds(bounds, {
+            top: 50, right: 50, bottom: 50, left: 50
+        });
+    }
+}
+
+// Fetch latest order data from server
+async function fetchOrderData() {
+    try {
+        const response = await fetch(`/admin/orders/{{ order.id }}/data`);
+        if (!response.ok) throw new Error('Failed to fetch order data');
+        
+        const data = await response.json();
+        
+        // Update delivery person's location if changed
+        if (data.delivery_person_lat && data.delivery_person_lng) {
+            updateDeliveryPersonMarker(data.delivery_person_lat, data.delivery_person_lng);
+        }
+        
+        // Update order status if needed
+        if (data.status) {
+            // Update UI to reflect status changes
+            updateOrderStatusUI(data.status, data.delivery_status);
+        }
+        
+        return true;
+    } catch (error) {
+        console.error('Error fetching order data:', error);
+        return false;
+    }
+}
+
+// Update UI based on order status
+function updateOrderStatusUI(status, deliveryStatus) {
+    // Update status badges if they exist
+    const statusBadge = document.querySelector('.order-status-badge');
+    const deliveryBadge = document.querySelector('.delivery-status-badge');
+    
+    if (statusBadge) {
+        statusBadge.textContent = status;
+        // Update badge color based on status
+        const statusClasses = ['bg-primary', 'bg-warning', 'bg-success', 'bg-danger'];
+        statusBadge.classList.remove(...statusClasses);
+        
+        if (status.toLowerCase().includes('pending')) {
+            statusBadge.classList.add('bg-warning');
+        } else if (status.toLowerCase().includes('deliver')) {
+            statusBadge.classList.add('bg-success');
+        } else if (status.toLowerCase().includes('cancel')) {
+            statusBadge.classList.add('bg-danger');
+        } else {
+            statusBadge.classList.add('bg-primary');
+        }
+    }
+    
+    if (deliveryBadge && deliveryStatus) {
+        deliveryBadge.textContent = deliveryStatus.replace('_', ' ');
+        // Update badge color based on delivery status
+        const deliveryClasses = ['bg-secondary', 'bg-info', 'bg-warning', 'bg-success', 'bg-danger'];
+        deliveryBadge.classList.remove(...deliveryClasses);
+        
+        if (deliveryStatus === 'pending') {
+            deliveryBadge.classList.add('bg-secondary');
+        } else if (deliveryStatus === 'in_progress') {
+            deliveryBadge.classList.add('bg-warning');
+        } else if (deliveryStatus === 'delivered') {
+            deliveryBadge.classList.add('bg-success');
+        } else if (deliveryStatus === 'cancelled') {
+            deliveryBadge.classList.add('bg-danger');
+        } else {
+            deliveryBadge.classList.add('bg-info');
+        }
+    }
+}
+
+// Start tracking updates
+function startTrackingUpdates() {
+    // Initial fetch
+    fetchOrderData();
+    
+    // Set up interval for updates (every 30 seconds)
+    trackingInterval = setInterval(fetchOrderData, 30000);
+    
+    // Update last updated time every minute
+    setInterval(updateLastUpdated, 60000);
+}
+
+// Stop tracking updates
+function stopTrackingUpdates() {
+    if (trackingInterval) {
+        clearInterval(trackingInterval);
+        trackingInterval = null;
+    }
+}
+
+// Refresh tracking data manually
+function refreshTracking() {
+    const refreshBtn = document.querySelector('button[onclick="refreshTracking()"]');
+    const originalText = refreshBtn.innerHTML;
+    
+    // Show loading state
+    refreshBtn.disabled = true;
+    refreshBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Refreshing...';
+    
+    fetchOrderData().finally(() => {
+        // Restore button state after a short delay
+        setTimeout(() => {
+            refreshBtn.disabled = false;
+            refreshBtn.innerHTML = originalText;
+        }, 1000);
+    });
+}
+
+// Open full screen map
+function openFullScreenMap(lat, lng) {
+    const url = `/admin/orders/{{ order.id }}/tracking?lat=${lat}&lng=${lng}`;
+    window.open(url, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
+}
+
+// Initialize the tracking when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Only initialize if we have the tracking map element
+    if (document.getElementById('trackingMap')) {
+        const customerLat = {{ order.latitude }};
+        const customerLng = {{ order.longitude }};
+        const deliveryPersonLat = {{ order.delivery_person_lat if order.delivery_person_lat else 'null' }};
+        const deliveryPersonLng = {{ order.delivery_person_lng if order.delivery_person_lng else 'null' }};
+        
+        initTrackingMap(customerLat, customerLng, deliveryPersonLat, deliveryPersonLng);
+    }
+    
+    // Update last updated time display periodically
+    setInterval(updateLastUpdated, 60000);
+});
+
+// Clean up when the page is unloaded
+window.addEventListener('beforeunload', function() {
+    stopTrackingUpdates();
+});
+</script>
+{% endblock %}
+{% endblock %}

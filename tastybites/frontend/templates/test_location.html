@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Test</title>
+</head>
+<body>
+    <h1>Location Test</h1>
+    
+    <button id="test-skip-location">Test Skip Location</button>
+    <button id="test-confirm-location">Test Confirm Location</button>
+    
+    <div id="result"></div>
+    
+    <script>
+        document.getElementById('test-skip-location').addEventListener('click', function() {
+            testSkipLocation();
+        });
+        
+        document.getElementById('test-confirm-location').addEventListener('click', function() {
+            testConfirmLocation();
+        });
+        
+        function testSkipLocation() {
+            console.log('Testing skip location...');
+            
+            const data = {
+                latitude: 24.8607,
+                longitude: 67.0011,
+                address: 'Default Location',
+                skipped: true
+            };
+            
+            console.log('Sending data:', data);
+            
+            fetch('/location', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                document.getElementById('result').innerHTML = `
+                    <h3>Skip Location Result:</h3>
+                    <p>Success: ${data.success}</p>
+                    <p>Message: ${data.message}</p>
+                `;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = `
+                    <h3>Error:</h3>
+                    <p>${error.message}</p>
+                `;
+            });
+        }
+        
+        function testConfirmLocation() {
+            console.log('Testing confirm location...');
+            
+            const data = {
+                latitude: 31.5497,
+                longitude: 74.3436,
+                address: 'Test Location',
+                skipped: false
+            };
+            
+            console.log('Sending data:', data);
+            
+            fetch('/location', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                document.getElementById('result').innerHTML = `
+                    <h3>Confirm Location Result:</h3>
+                    <p>Success: ${data.success}</p>
+                    <p>Message: ${data.message}</p>
+                `;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = `
+                    <h3>Error:</h3>
+                    <p>${error.message}</p>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>

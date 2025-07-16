@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Menu - TastyBites</title>
+    <link rel="stylesheet" href="../static/css/index.css">
+    <link rel="stylesheet" href="../static/css/menu.css">
+    <link rel="stylesheet" href="../static/css/cart.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>TastyBites</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/menu" class="active">Menu</a></li>
+                    <li><a href="/about">About Us</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="auth-buttons">
+                {% if current_user.is_authenticated %}
+                <a href="/profile" class="btn btn-login">My Profile</a>
+                <a href="/logout" class="btn btn-signup">Logout</a>
+                {% else %}
+                <a href="/login" class="btn btn-login">Login</a>
+                <a href="/sign-up" class="btn btn-signup">Sign Up</a>
+                {% endif %}
+                <div class="cart-icon">
+                    <a href="#cart-section"><i class="fas fa-shopping-cart"></i></a>
+                    <span id="cart-count" class="cart-count">0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Menu Hero Section -->
+    <section class="menu-hero">
+        <div class="container">
+            <h1>Our Menu</h1>
+            <p>Explore our delicious offerings</p>
+        </div>
+    </section>
+
+    <!-- Menu Categories -->
+    <section class="menu-categories">
+        <div class="container">
+            <div class="category-tabs">
+                <button class="category-tab active" data-category="all">All</button>
+                <button class="category-tab" data-category="Burgers">Burgers</button>
+                <button class="category-tab" data-category="Pizza">Pizza</button>
+                <button class="category-tab" data-category="Salads">Salads</button>
+                <button class="category-tab" data-category="Desserts">Desserts</button>
+                <button class="category-tab deals-tab" data-category="Deals">Deals</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Items -->
+    <section class="menu-items">
+        <div class="container">
+            <div class="menu-grid">
+                {% for item in menu_items %}
+                <div class="menu-item" data-category="{{ item.category }}">
+                    <div class="menu-item-image">
+                        <img src="{{ item.image_url }}" alt="{{ item.name }}">
+                    </div>
+                    <div class="menu-item-content">
+                        <h3>{{ item.name }}</h3>
+                        <p class="menu-item-description">{{ item.description }}</p>
+                        <div class="menu-item-footer">
+                            <span class="menu-item-price">${{ item.price }}</span>
+                            <button class="add-to-cart-btn" onclick="addToCart('{{ item.id }}', '{{ item.name }}', '{{ item.price }}')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Cart Section -->
+    <section id="cart-section" class="cart-section">
+        <div class="container">
+            <div class="cart-container">
+                <div class="cart-header">
+                    <h2 class="cart-title">Your Order</h2>
+                    <button class="btn btn-link text-danger" onclick="clearCart()" id="clear-cart-btn">
+                        <i class="fas fa-trash-alt"></i> Clear Cart
+                    </button>
+                </div>
+                
+                <div id="cart-items" class="cart-items">
+                    <div class="empty-cart-message">
+                        <i class="fas fa-shopping-cart"></i>
+                        <p>Your cart is empty</p>
+                        <a href="#menu" class="btn btn-primary">Browse Menu</a>
+                    </div>
+                </div>
+                
+                <div class="cart-summary">
+                    <div class="cart-total-container">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Subtotal:</span>
+                            <span id="cart-subtotal">$0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Tax (10%):</span>
+                            <span id="cart-tax">$0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <strong>Total:</strong>
+                            <strong id="cart-total">$0.00</strong>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button 
+                            id="place-order-btn" 
+                            class="btn btn-primary btn-lg" 
+                            onclick="placeOrder()"
+                            disabled
+                        >
+                            <span>Place Order</span>
+                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        </button>
+                        
+                        <div class="secure-checkout text-center mt-2">
+                            <i class="fas fa-lock"></i> Secure Checkout
+                        </div>
+                        
+                        <div class="accepted-payments text-center mt-3">
+                            <i class="fab fa-cc-visa"></i>
+                            <i class="fab fa-cc-mastercard"></i>
+                            <i class="fab fa-cc-amex"></i>
+                            <i class="fab fa-cc-paypal"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>TastyBites</h2>
+                    <p>We deliver the best food right to your doorstep.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/about">About Us</a></li>
+                        <li><a href="/menu">Menu</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="newsletter">
+                    <h3>Newsletter</h3>
+                    <p>Subscribe to get updates on our latest recipes.</p>
+                    <form>
+                        <input type="email" placeholder="Your email">
+                        <button type="submit">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 TastyBites. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../static/js/main.js"></script>
+    <script src="../static/js/cart.js"></script>
+    <script>
+        // Category filter functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const categoryTabs = document.querySelectorAll('.category-tab');
+            const menuItems = document.querySelectorAll('.menu-item');
+            
+            categoryTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    categoryTabs.forEach(t => t.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Get selected category
+                    const category = this.getAttribute('data-category');
+                    
+                    // Show/hide menu items based on category
+                    menuItems.forEach(item => {
+                        if (category === 'all' || item.getAttribute('data-category') === category) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        });
+        
+        // Add notification element for cart messages
+        const notificationElement = document.createElement('div');
+        notificationElement.id = 'cart-notification';
+        document.body.appendChild(notificationElement);
+    </script>
+</body>
+</html>

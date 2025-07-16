@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Your Location - TastyBites</title>
+    <link rel="stylesheet" href="../static/css/index.css">
+    <link rel="stylesheet" href="../static/css/location.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>TastyBites</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/about">About Us</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="auth-buttons">
+                {% if current_user.is_authenticated %}
+                <a href="/profile" class="btn btn-login">My Profile</a>
+                <a href="/logout" class="btn btn-signup">Logout</a>
+                {% else %}
+                <a href="/login" class="btn btn-login">Login</a>
+                <a href="/sign-up" class="btn btn-signup">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Location Section -->
+    <section class="location-section">
+        <div class="container">
+            <div class="location-container">
+                <div class="location-header">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h1>Set Your Delivery Location</h1>
+                    <p>We need your location to show you the best restaurants and deliver your food.</p>
+                </div>
+
+                <div class="location-content">
+                    <div class="map-container">
+                        <div id="map"></div>
+                    </div>
+                    
+                    <div class="location-controls">
+                        <button id="get-current-location" class="btn btn-primary">
+                            <i class="fas fa-crosshairs"></i>
+                            Use Current Location
+                        </button>
+                        
+                        <div class="location-info">
+                            <p id="location-status">Click on the map or use current location</p>
+                            <div id="selected-location" class="selected-location"></div>
+                        </div>
+                        
+                        <div class="location-buttons">
+                            <button id="confirm-location" class="btn btn-success" style="display: none;">
+                                <i class="fas fa-check"></i>
+                                Confirm Location & Continue
+                            </button>
+                            <button id="skip-location" class="btn btn-secondary">
+                                <i class="fas fa-times"></i>
+                                Skip Location
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>TastyBites</h2>
+                    <p>We deliver the best food right to your doorstep.</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/about">About Us</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 TastyBites. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBUbHT5VcnoN4RWor4k60_6M3vvXtw-0qs&libraries=geometry"></script>
+    
+    <script>
+        let map, marker, currentLocation = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            initMap();
+            
+            // Get current location button
+            document.getElementById('get-current-location').addEventListener('click', function() {
+                getCurrentLocation();
+            });
+            
+            // Confirm location button
+            document.getElementById('confirm-location').addEventListener('click', function() {
+                confirmLocation();
+            });
+            
+            // Skip location button
+            document.getElementById('skip-location').addEventListener('click', function() {
+                skipLocation();
+            });
+        });
+        
+        function initMap() {
+            // Default location (restaurant location)
+            const defaultLocation = { lat: 24.8607, lng: 67.0011 }; // Karachi, Pakistan
+            
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 15,
+                center: defaultLocation,
+                mapTypeControl: false,
+                streetViewControl: false,
+                fullscreenControl: false
+            });
+            
+            marker = new google.maps.Marker({
+                position: defaultLocation,
+                map: map,
+                draggable: true,
+                title: 'Your Delivery Location'
+            });
+            
+            // Handle marker drag
+            marker.addListener('dragend', function() {
+                const position = marker.getPosition();
+                updateLocation(position.lat(), position.lng());
+            });
+            
+            // Handle map click
+            map.addListener('click', function(event) {
+                marker.setPosition(event.latLng);
+                updateLocation(event.latLng.lat(), event.latLng.lng());
+            });
+        }
+        
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                document.getElementById('location-status').textContent = 'Getting your location...';
+                
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        const location = { lat, lng };
+                        
+                        map.setCenter(location);
+                        marker.setPosition(location);
+                        updateLocation(lat, lng);
+                    },
+                    function(error) {
+                        document.getElementById('location-status').textContent = 'Unable to get your location. Please click on the map to set your location.';
+                        console.error('Geolocation error:', error);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            } else {
+                document.getElementById('location-status').textContent = 'Geolocation is not supported by this browser. Please click on the map.';
+            }
+        }
+        
+        function updateLocation(lat, lng) {
+            currentLocation = { lat, lng };
+            
+            // Show confirm button
+            document.getElementById('confirm-location').style.display = 'block';
+            
+            // Update location display
+            document.getElementById('selected-location').innerHTML = `
+                <div class="location-preview">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Selected Location: ${lat.toFixed(6)}, ${lng.toFixed(6)}</span>
+                </div>
+            `;
+            
+            document.getElementById('location-status').textContent = 'Location selected! Click confirm to continue.';
+        }
+        
+        function confirmLocation() {
+            if (!currentLocation) {
+                alert('Please select a location first.');
+                return;
+            }
+            
+            // Show loading state
+            const confirmBtn = document.getElementById('confirm-location');
+            const originalText = confirmBtn.innerHTML;
+            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving Location...';
+            confirmBtn.disabled = true;
+            
+            // Send location to backend
+            fetch('/location', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    latitude: currentLocation.lat,
+                    longitude: currentLocation.lng,
+                    address: `${currentLocation.lat.toFixed(6)}, ${currentLocation.lng.toFixed(6)}`
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Redirect to menu
+                    window.location.href = '/menu';
+                } else {
+                    alert('Error saving location: ' + data.message);
+                    confirmBtn.innerHTML = originalText;
+                    confirmBtn.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while saving your location. Please try again.');
+                confirmBtn.innerHTML = originalText;
+                confirmBtn.disabled = false;
+            });
+        }
+        
+        function skipLocation() {
+            // Show confirmation dialog
+            if (confirm('Are you sure you want to skip location? This may affect delivery accuracy.')) {
+                // Set a default location in session storage for later use
+                const defaultLocation = {
+                    latitude: 24.8607,
+                    longitude: 67.0011,
+                    address: 'Default Location',
+                    skipped: true
+                };
+                
+                // Store in localStorage as a fallback
+                localStorage.setItem('user_location', JSON.stringify(defaultLocation));
+                
+                // Show loading state
+                const skipBtn = document.getElementById('skip-location');
+                skipBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Skipping...';
+                skipBtn.disabled = true;
+                
+                // Short delay to show loading state, then redirect
+                setTimeout(() => {
+                    window.location.href = '/menu';
+                }, 500);
+            }
+        }
+    </script>
+</body>
+</html>
