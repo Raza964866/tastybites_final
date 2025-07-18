@@ -10,12 +10,7 @@ mysql = MySQL()
 
 def init_mysql(app):
     app.config['MYSQL_HOST'] = 'localhost'
-    app.config['MYSQL_USER'] = 'root'
-    # Update this password to match your actual MySQL root password
-    app.config['MYSQL_PASSWORD'] = 'Door@1234'  # Make sure this is your correct MySQL password
-    app.config['MYSQL_DB'] = 'tastybites_db'
-    app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
-    mysql.init_app(app)
+    
     return mysql
 
 def init_db():
