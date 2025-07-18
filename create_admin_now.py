@@ -36,10 +36,10 @@ def create_admin_user():
             # Create admin user
             admin_user = User(
                 name='Admin User',
-                email='syedrazah76@gmail.com',
+                email='ail.com',
                 phone='1234567890',
                 address='Admin Address',
-                password=generate_password_hash('raza123', method='pbkdf2:sha256'),
+                password=generate_password_hash('', method='pbkdf2:sha256'),
                 role='admin',
                 is_verified=True
             )
@@ -48,8 +48,8 @@ def create_admin_user():
                 db.session.add(admin_user)
                 db.session.commit()
                 print("✓ Admin user created successfully!")
-                print("  Email: syedrazah76@gmail.com")
-                print("  Password: raza123")
+                print("  Email: scom")
+                print("  Password: ")
                 print("  Role: admin")
             except Exception as e:
                 print(f"✗ Error creating admin user: {e}")
